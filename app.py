@@ -166,6 +166,8 @@ def sam_refine(video_state, point_prompt, click_state, interactive_state, evt:gr
         point_prompt: flag for positive or negative button click
         click_state: [[points], [labels]]
     """
+
+    print('sam refine', video_state.keys(), point_prompt, click_state, interactive_state.keys(), evt)
     if point_prompt == "Positive":
         coordinate = "[[{},{},1]]".format(evt.index[0], evt.index[1])
         interactive_state["positive_click_times"] += 1
@@ -378,7 +380,7 @@ SAM_checkpoint = download_checkpoint(sam_checkpoint_url, folder, sam_checkpoint)
 xmem_checkpoint = download_checkpoint(xmem_checkpoint_url, folder, xmem_checkpoint)
 e2fgvi_checkpoint = download_checkpoint_from_google_drive(e2fgvi_checkpoint_id, folder, e2fgvi_checkpoint)
 args.port = 12212
-args.device = "cuda:3"
+args.device = "cuda:0"
 # args.mask_save = True
 
 # initialize sam, xmem, e2fgvi models
@@ -476,7 +478,8 @@ with gr.Blocks() as iface:
         ],
         outputs=[video_state, video_info, template_frame,
                  image_selection_slider, track_pause_number_slider,point_prompt, clear_button_click, Add_mask_button, template_frame,
-                 tracking_video_predict_button, video_output, mask_dropdown, remove_mask_button, inpaint_video_predict_button, run_status]
+                 tracking_video_predict_button, video_output, mask_dropdown, remove_mask_button, inpaint_video_predict_button, run_status],
+        api_name="extract_frames"
     )   
 
     # second step: select images from slider
@@ -494,27 +497,31 @@ with gr.Blocks() as iface:
     template_frame.select(
         fn=sam_refine,
         inputs=[video_state, point_prompt, click_state, interactive_state],
-        outputs=[template_frame, video_state, interactive_state, run_status]
+        outputs=[template_frame, video_state, interactive_state, run_status],
+        api_name = "sam_refine"
     )
 
     # add different mask
     Add_mask_button.click(
         fn=add_multi_mask,
         inputs=[video_state, interactive_state, mask_dropdown],
-        outputs=[interactive_state, mask_dropdown, template_frame, click_state, run_status]
+        outputs=[interactive_state, mask_dropdown, template_frame, click_state, run_status],
+        api_name="add_mask_button"
     )
 
     remove_mask_button.click(
         fn=remove_multi_mask,
         inputs=[interactive_state, mask_dropdown],
-        outputs=[interactive_state, mask_dropdown, run_status]
+        outputs=[interactive_state, mask_dropdown, run_status],
+        api_name="remove_mask_button"
     )
 
     # tracking video from select image and mask
     tracking_video_predict_button.click(
         fn=vos_tracking_video,
         inputs=[video_state, interactive_state, mask_dropdown],
-        outputs=[video_output, video_state, interactive_state, run_status]
+        outputs=[video_output, video_state, interactive_state, run_status],
+        api_name="tracking_video_predict"
     )
 
     # inpaint video from select image and mask
@@ -597,6 +604,6 @@ with gr.Blocks() as iface:
         outputs=[video_input],
         # cache_examples=True,
     ) 
-iface.queue(concurrency_count=1)
-iface.launch(debug=True, enable_queue=True, server_port=args.port, server_name="0.0.0.0")
+# iface.queue(concurrency_count=1)
+iface.launch(debug=True, enable_queue=False, server_port=args.port, server_name="0.0.0.0")
 # iface.launch(debug=True, enable_queue=True)
