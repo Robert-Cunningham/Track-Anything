@@ -27,7 +27,7 @@ class BaseTracker:
         xmem_checkpoint: checkpoint of XMem model
         """
         # load configurations
-        with open("/home/robert/Documents/sd-hazel-2/Track-Anything/tracker/config/config.yaml", "r") as stream:
+        with open("./modules/tracking/Track-Anything/tracker/config/config.yaml", "r") as stream:
             config = yaml.safe_load(stream)
         # initialise XMem
         network = XMem(config, xmem_checkpoint).to(device).eval()
