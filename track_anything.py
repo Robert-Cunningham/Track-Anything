@@ -1,11 +1,11 @@
+import argparse
+
+import numpy as np
 import PIL
 from tqdm import tqdm
 
-from tools.interact_tools import SamControler
-from tracker.base_tracker import BaseTracker
-
-import numpy as np
-import argparse
+from track_anything.tools.interact_tools import SamControler
+from track_anything.tracker.base_tracker import BaseTracker
 
 
 class TrackingAnything:

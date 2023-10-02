@@ -1,23 +1,24 @@
 # import for debugging
-import os
 import glob
+import os
+
 import numpy as np
-from PIL import Image
 
 # import for base_tracker
 import torch
-import yaml
 import torch.nn.functional as F
-from tracker.model.network import XMem
-from inference.inference_core import InferenceCore
-from tracker.util.mask_mapper import MaskMapper
+import yaml
+from PIL import Image
 from torchvision import transforms
-from tracker.util.range_transform import im_normalization
-
-from tools.painter import mask_painter
-from tools.base_segmenter import BaseSegmenter
 from torchvision.transforms import Resize
 from tqdm import tqdm
+
+from track_anything.tools.base_segmenter import BaseSegmenter
+from track_anything.tools.painter import mask_painter
+from track_anything.tracker.inference.inference_core import InferenceCore
+from track_anything.tracker.model.network import XMem
+from track_anything.tracker.util.mask_mapper import MaskMapper
+from track_anything.tracker.util.range_transform import im_normalization
 
 
 class BaseTracker:

@@ -18,8 +18,9 @@ import requests
 import torch
 import torchvision
 
-from tools.painter import mask_painter
-from track_anything import TrackingAnything, parse_augment
+from track_anything.tools.painter import mask_painter
+
+from .track_anything import TrackingAnything, parse_augment
 
 try:
     from mmcv.cnn import ConvModule
