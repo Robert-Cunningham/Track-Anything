@@ -2,8 +2,8 @@ import warnings
 
 import torch
 
-from track_anything.tracker.inference.kv_memory_store import KeyValueMemoryStore
-from track_anything.tracker.model.memory_util import *
+from track_anything.xmem.inference.kv_memory_store import KeyValueMemoryStore
+from track_anything.xmem.model.memory_util import *
 
 
 class MemoryManager:

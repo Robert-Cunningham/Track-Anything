@@ -13,8 +13,8 @@ import torch.optim as optim
 from util.image_saver import pool_pairs
 from util.log_integrator import Integrator
 
-from track_anything.tracker.model.losses import LossComputer
-from track_anything.tracker.model.network import XMem
+from track_anything.xmem.model.losses import LossComputer
+from track_anything.xmem.model.network import XMem
 
 
 class XMemTrainer:

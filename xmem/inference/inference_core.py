@@ -1,7 +1,7 @@
-from track_anything.tracker.inference.memory_manager import MemoryManager
-from track_anything.tracker.model.aggregate import aggregate
-from track_anything.tracker.model.network import XMem
-from track_anything.tracker.util.tensor_util import pad_divide_by, unpad
+from track_anything.xmem.inference.memory_manager import MemoryManager
+from track_anything.xmem.model.aggregate import aggregate
+from track_anything.xmem.model.network import XMem
+from track_anything.xmem.util.tensor_util import pad_divide_by, unpad
 
 
 class InferenceCore:

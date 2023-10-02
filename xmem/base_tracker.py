@@ -14,12 +14,11 @@ from torchvision import transforms
 from torchvision.transforms import Resize
 from tqdm import tqdm
 
-from track_anything.tools.base_segmenter import BaseSegmenter
 from track_anything.tools.painter import mask_painter
-from track_anything.tracker.inference.inference_core import InferenceCore
-from track_anything.tracker.model.network import XMem
-from track_anything.tracker.util.mask_mapper import MaskMapper
-from track_anything.tracker.util.range_transform import im_normalization
+from track_anything.xmem.inference.inference_core import InferenceCore
+from track_anything.xmem.model.network import XMem
+from track_anything.xmem.util.mask_mapper import MaskMapper
+from track_anything.xmem.util.range_transform import im_normalization
 
 from . import config as config_dir
 
