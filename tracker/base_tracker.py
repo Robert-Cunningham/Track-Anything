@@ -162,7 +162,6 @@ if __name__ == "__main__":
     # SAM_checkpoint= '/ssd1/gaomingqi/checkpoints/sam_vit_h_4b8939.pth'
     # model_type = 'vit_h'
     # ------------------------------------------------------------------------------------
-    # 2/4: initialise inpainter
     tracker = BaseTracker(XMEM_checkpoint, device, None, device)
     # ------------------------------------------------------------------------------------
     # 3/4: for each frame, get tracking results by tracker.track(frame, first_frame_annotation)
