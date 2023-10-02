@@ -1,6 +1,7 @@
 # import for debugging
 import glob
 import os
+from importlib import resources as impresources
 
 import numpy as np
 
@@ -20,6 +21,12 @@ from track_anything.tracker.model.network import XMem
 from track_anything.tracker.util.mask_mapper import MaskMapper
 from track_anything.tracker.util.range_transform import im_normalization
 
+from . import config as config_dir
+
+# inp_file = (impresources.files(config) / 'config.yml')
+# with inp_file.open("rt") as f:
+#    template = f.read()
+
 
 class BaseTracker:
     def __init__(self, xmem_checkpoint, device, sam_model=None, model_type=None) -> None:
@@ -28,7 +35,7 @@ class BaseTracker:
         xmem_checkpoint: checkpoint of XMem model
         """
         # load configurations
-        with open("./Track-Anything/tracker/config/config.yaml", "r") as stream:
+        with (impresources.files(config_dir) / "config.yaml").open("rt") as stream:
             config = yaml.safe_load(stream)
         # initialise XMem
         network = XMem(config, xmem_checkpoint).to(device).eval()
