@@ -14,17 +14,13 @@ from torchvision import transforms
 from torchvision.transforms import Resize
 from tqdm import tqdm
 
-from track_anything.tools.painter import mask_painter
+from track_anything.painter import mask_painter
 from track_anything.xmem.inference.inference_core import InferenceCore
 from track_anything.xmem.model.network import XMem
 from track_anything.xmem.util.mask_mapper import MaskMapper
 from track_anything.xmem.util.range_transform import im_normalization
 
 from . import config as config_dir
-
-# inp_file = (impresources.files(config) / 'config.yml')
-# with inp_file.open("rt") as f:
-#    template = f.read()
 
 
 class BaseTracker:
@@ -136,134 +132,3 @@ class BaseTracker:
         self.tracker.clear_memory()
         self.mapper.clear_labels()
         torch.cuda.empty_cache()
-
-
-##  how to use:
-##  1/3) prepare device and xmem_checkpoint
-#   device = 'cuda:2'
-#   XMEM_checkpoint = '/ssd1/gaomingqi/checkpoints/XMem-s012.pth'
-##  2/3) initialise Base Tracker
-#   tracker = BaseTracker(XMEM_checkpoint, device, None, device)    # leave an interface for sam model (currently set None)
-##  3/3)
-
-
-if __name__ == "__main__":
-    # video frames (take videos from DAVIS-2017 as examples)
-    video_path_list = glob.glob(os.path.join("/ssd1/gaomingqi/datasets/davis/JPEGImages/480p/horsejump-high", "*.jpg"))
-    video_path_list.sort()
-    # load frames
-    frames = []
-    for video_path in video_path_list:
-        frames.append(np.array(Image.open(video_path).convert("RGB")))
-    frames = np.stack(frames, 0)  # T, H, W, C
-    # load first frame annotation
-    first_frame_path = "/ssd1/gaomingqi/datasets/davis/Annotations/480p/horsejump-high/00000.png"
-    first_frame_annotation = np.array(Image.open(first_frame_path).convert("P"))  # H, W, C
-
-    # ------------------------------------------------------------------------------------
-    # how to use
-    # ------------------------------------------------------------------------------------
-    # 1/4: set checkpoint and device
-    device = "cuda:2"
-    XMEM_checkpoint = "/ssd1/gaomingqi/checkpoints/XMem-s012.pth"
-    # SAM_checkpoint= '/ssd1/gaomingqi/checkpoints/sam_vit_h_4b8939.pth'
-    # model_type = 'vit_h'
-    # ------------------------------------------------------------------------------------
-    tracker = BaseTracker(XMEM_checkpoint, device, None, device)
-    # ------------------------------------------------------------------------------------
-    # 3/4: for each frame, get tracking results by tracker.track(frame, first_frame_annotation)
-    # frame: numpy array (H, W, C), first_frame_annotation: numpy array (H, W), leave it blank when tracking begins
-    painted_frames = []
-    for ti, frame in enumerate(frames):
-        if ti == 0:
-            mask, prob, painted_frame = tracker.track(frame, first_frame_annotation)
-            # mask:
-        else:
-            mask, prob, painted_frame = tracker.track(frame)
-        painted_frames.append(painted_frame)
-    # ----------------------------------------------
-    # 3/4: clear memory in XMEM for the next video
-    tracker.clear_memory()
-    # ----------------------------------------------
-    # end
-    # ----------------------------------------------
-    print(f"max memory allocated: {torch.cuda.max_memory_allocated()/(2**20)} MB")
-    # set saving path
-    save_path = "/ssd1/gaomingqi/results/TAM/blackswan"
-    if not os.path.exists(save_path):
-        os.mkdir(save_path)
-    # save
-    for painted_frame in tqdm(painted_frames):
-        painted_frame = Image.fromarray(painted_frame)
-        painted_frame.save(f"{save_path}/{ti:05d}.png")
-
-    # tracker.clear_memory()
-    # for ti, frame in enumerate(frames):
-    #     print(ti)
-    #     # if ti > 200:
-    #     #     break
-    #     if ti == 0:
-    #         mask, prob, painted_image = tracker.track(frame, first_frame_annotation)
-    #     else:
-    #         mask, prob, painted_image = tracker.track(frame)
-    #     # save
-    #     painted_image = Image.fromarray(painted_image)
-    #     painted_image.save(f'/ssd1/gaomingqi/results/TrackA/gsw/{ti:05d}.png')
-
-    # # track anything given in the first frame annotation
-    # for ti, frame in enumerate(frames):
-    #     if ti == 0:
-    #         mask, prob, painted_image = tracker.track(frame, first_frame_annotation)
-    #     else:
-    #         mask, prob, painted_image = tracker.track(frame)
-    #     # save
-    #     painted_image = Image.fromarray(painted_image)
-    #     painted_image.save(f'/ssd1/gaomingqi/results/TrackA/horsejump-high/{ti:05d}.png')
-
-    # # ----------------------------------------------------------
-    # # another video
-    # # ----------------------------------------------------------
-    # # video frames
-    # video_path_list = glob.glob(os.path.join('/ssd1/gaomingqi/datasets/davis/JPEGImages/480p/camel', '*.jpg'))
-    # video_path_list.sort()
-    # # first frame
-    # first_frame_path = '/ssd1/gaomingqi/datasets/davis/Annotations/480p/camel/00000.png'
-    # # load frames
-    # frames = []
-    # for video_path in video_path_list:
-    #     frames.append(np.array(Image.open(video_path).convert('RGB')))
-    # frames = np.stack(frames, 0)    # N, H, W, C
-    # # load first frame annotation
-    # first_frame_annotation = np.array(Image.open(first_frame_path).convert('P'))    # H, W, C
-
-    # print('first video done. clear.')
-
-    # tracker.clear_memory()
-    # # track anything given in the first frame annotation
-    # for ti, frame in enumerate(frames):
-    #     if ti == 0:
-    #         mask, prob, painted_image = tracker.track(frame, first_frame_annotation)
-    #     else:
-    #         mask, prob, painted_image = tracker.track(frame)
-    #     # save
-    #     painted_image = Image.fromarray(painted_image)
-    #     painted_image.save(f'/ssd1/gaomingqi/results/TrackA/camel/{ti:05d}.png')
-
-    # # failure case test
-    # failure_path = '/ssd1/gaomingqi/failure'
-    # frames = np.load(os.path.join(failure_path, 'video_frames.npy'))
-    # # first_frame = np.array(Image.open(os.path.join(failure_path, 'template_frame.png')).convert('RGB'))
-    # first_mask = np.array(Image.open(os.path.join(failure_path, 'template_mask.png')).convert('P'))
-    # first_mask = np.clip(first_mask, 0, 1)
-
-    # for ti, frame in enumerate(frames):
-    #     if ti == 0:
-    #         mask, probs, painted_image = tracker.track(frame, first_mask)
-    #     else:
-    #         mask, probs, painted_image = tracker.track(frame)
-    #     # save
-    #     painted_image = Image.fromarray(painted_image)
-    #     painted_image.save(f'/ssd1/gaomingqi/failure/LJ/{ti:05d}.png')
-    #     prob = Image.fromarray((probs[1].cpu().numpy()*255).astype('uint8'))
-
-    #     # prob.save(f'/ssd1/gaomingqi/failure/probs/{ti:05d}.png')
