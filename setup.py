@@ -1,3 +1,3 @@
 from setuptools import find_packages, setup
 
-setup(packages=find_packages())
+setup(name="track_anything", version="0.3.0", description="Track Anything, Refactored", packages=find_packages(), install_requires=["numpy", "opencv-python", "pyyaml", "tqdm"])
