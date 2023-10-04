@@ -1,5 +1,6 @@
 numpy
-git+https://github.com/facebookresearch/segment-anything.git
+# git+https://github.com/facebookresearch/segment-anything.git
+segment-anything-hq
 opencv-python
 pyyaml
 tqdm
